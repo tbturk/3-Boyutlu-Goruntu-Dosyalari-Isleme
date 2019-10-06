@@ -5,7 +5,7 @@
 #include <string.h>
 //batuhanin yazdigi kisim
 
-
+//alo
 struct noktaBilgisi{
 	int i,j,k;
 	int r,g,b;
