@@ -96,5 +96,7 @@
     <File Name="main.c"/>
     <File Name="ibrahim.c"/>
     <File Name="batuhan.c"/>
+    <File Name="veriler1.nkt"/>
+    <File Name="veriler2.nkt"/>
   </VirtualDirectory>
 </CodeLite_Project>
