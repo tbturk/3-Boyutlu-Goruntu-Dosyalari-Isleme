@@ -5,7 +5,7 @@
 #include <string.h>
 //batuhanin yazdigi kisim
 //ibr
-
+//alo
 struct noktaBilgisi{
 	int i,j,k;
 	int r,g,b;
@@ -97,5 +97,5 @@ void islemSecim(){
 }
 
 void dosyaKontrol(){
-
+	
 }

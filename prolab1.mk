@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IntermediateDirectory)/ibrahim.c$(ObjectSuffix) $(IntermediateDirectory)/batuhan.c$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/batuhan.c$(ObjectSuffix) 
 
 
 
@@ -91,22 +91,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "/home/tbturk/Desktop/github/pro-lab-1/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/main.c$(DependSuffix): main.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
-
-$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
-
-$(IntermediateDirectory)/ibrahim.c$(ObjectSuffix): ibrahim.c $(IntermediateDirectory)/ibrahim.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "/home/tbturk/Desktop/github/pro-lab-1/ibrahim.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/ibrahim.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/ibrahim.c$(DependSuffix): ibrahim.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/ibrahim.c$(ObjectSuffix) -MF$(IntermediateDirectory)/ibrahim.c$(DependSuffix) -MM ibrahim.c
-
-$(IntermediateDirectory)/ibrahim.c$(PreprocessSuffix): ibrahim.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ibrahim.c$(PreprocessSuffix) ibrahim.c
-
 $(IntermediateDirectory)/batuhan.c$(ObjectSuffix): batuhan.c $(IntermediateDirectory)/batuhan.c$(DependSuffix)
 	$(CC) $(SourceSwitch) "/home/tbturk/Desktop/github/pro-lab-1/batuhan.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/batuhan.c$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/batuhan.c$(DependSuffix): batuhan.c
