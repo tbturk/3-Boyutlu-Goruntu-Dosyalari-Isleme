@@ -4,7 +4,7 @@
 #include <dirent.h>
 #include <string.h>
 //batuhanin yazdigi kisim
-
+//ibr
 //alo
 struct noktaBilgisi{
 	int i,j,k;
@@ -22,9 +22,9 @@ int main(int argc, char **argv)
 	//karsilamaEkrani();
 	//islemSecim();
 	listdir("../",0);
-	
-	
-	
+
+
+
 	return 0;
 }
 
@@ -73,7 +73,7 @@ void islemSecim(){
 		switch(secim){
 			case 1: printf("1 secilmistir \n");
 			break;
-			
+
 			case 2: printf("2 secilmistir \n");
 			break;
 
@@ -85,7 +85,7 @@ void islemSecim(){
 
 			case 5: printf("5 secilmistir \n");
 			break;
-			
+
 			default: printf("yanlis bir deger girdiniz (lutfen [1,5] arasi deger giriniz) \n");
 			secim=0;
 			break;
