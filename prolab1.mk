@@ -60,7 +60,7 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/batuhan.c$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.c$(ObjectSuffix) 
 
 
 
@@ -91,13 +91,13 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/batuhan.c$(ObjectSuffix): batuhan.c $(IntermediateDirectory)/batuhan.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "/home/tbturk/Desktop/github/pro-lab-1/batuhan.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/batuhan.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/batuhan.c$(DependSuffix): batuhan.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/batuhan.c$(ObjectSuffix) -MF$(IntermediateDirectory)/batuhan.c$(DependSuffix) -MM batuhan.c
+$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
+	$(CC) $(SourceSwitch) "/home/tbturk/Desktop/github/pro-lab-1/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/main.c$(DependSuffix): main.c
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
 
-$(IntermediateDirectory)/batuhan.c$(PreprocessSuffix): batuhan.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/batuhan.c$(PreprocessSuffix) batuhan.c
+$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) main.c
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

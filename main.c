@@ -19,8 +19,8 @@ void listdir();
 
 int main(int argc, char **argv)
 {
-	//karsilamaEkrani();
-	//islemSecim();
+	karsilamaEkrani();
+	islemSecim();
 	listdir("../",0);
 
 
