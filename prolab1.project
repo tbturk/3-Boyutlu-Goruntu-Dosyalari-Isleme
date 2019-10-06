@@ -93,10 +93,8 @@
     </Configuration>
   </Settings>
   <VirtualDirectory Name="src">
-    <File Name="main.c"/>
-    <File Name="ibrahim.c"/>
-    <File Name="batuhan.c"/>
     <File Name="veriler1.nkt"/>
     <File Name="veriler2.nkt"/>
+    <File Name="main.c"/>
   </VirtualDirectory>
 </CodeLite_Project>
