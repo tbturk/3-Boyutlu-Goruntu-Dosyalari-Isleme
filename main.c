@@ -97,5 +97,8 @@ void islemSecim(){
 }
 
 void dosyaKontrol(){
-	
-}
+
+
+
+int uzaklik()//buraya 3 boyutlu noktalar arası uzaklık formülü yazılacak
+//https://fcvideo.info/20-analitik-geometri-uzayda-vekt%C3%B6rler-%C3%BC%C3%A7-boyutlu-uzayda-iki-nokta-aras%C4%B1ndaki-uzakl%C4%B1k_FanClubyeRncNjCC0I.html
