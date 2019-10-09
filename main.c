@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <string.h>
+#include <math.h>
 //batuhanin yazdigi kisim
 //ibr
 //alo
@@ -98,7 +99,11 @@ void islemSecim(){
 
 void dosyaKontrol(){
 
+<<<<<<< Updated upstream
 
 
 int uzaklik()//buraya 3 boyutlu noktalar arası uzaklık formülü yazılacak
 //https://fcvideo.info/20-analitik-geometri-uzayda-vekt%C3%B6rler-%C3%BC%C3%A7-boyutlu-uzayda-iki-nokta-aras%C4%B1ndaki-uzakl%C4%B1k_FanClubyeRncNjCC0I.html
+=======
+}
+>>>>>>> Stashed changes
