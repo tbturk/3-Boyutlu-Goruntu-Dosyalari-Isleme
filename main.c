@@ -12,6 +12,105 @@ struct noktaBilgisi{
 	int r,g,b;
 };
 
+struct kureYarat{
+    float x;
+    float y;
+    float z;
+    float r;
+};
+
+void kureTanimla(struct kureYarat *kure){
+
+    printf("Kurenin merkezinin x koordinatini girin:");
+    scanf("%f",&kure->x);
+    printf("Kurenin merkezinin y koordinatini girin:");
+    scanf("%f",&kure->y);
+    printf("Kurenin merkezinin z koordinatini girin:");
+    scanf("%f",&kure->z);
+    printf("Kurenin yaricapini girin               :");
+    scanf("%f",&kure->r);
+}
+
+void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure, float zKure, float rKure){
+    if(fabs(xNokta) <= xKure+rKure){ //x ekseninin sinirlarini belirledik
+        if(fabs(yNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) ) ){//x'e gore y'nin max alabilecegi degeri belirledik
+            if(fabs(zNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) - pow(yNokta,2)) ){//x ve y'ye gore z'nin max alabilecegi degeri belirledik
+                printf("\nx=%f y=%f z=%f",xNokta,yNokta,zNokta);
+            }
+        }
+    }
+}
+
+void kureIciNoktalar1(struct kureYarat kure, float xNokta, float yNokta, float zNokta){
+
+    if(kure.x==0 && kure.y==0 && kure.z==0){
+        icindeMi(xNokta, yNokta, zNokta, kure.x, kure.y, kure.z, kure.r);
+    }
+
+    else if(kure.x==0 && kure.y!=0 && kure.z==0){
+        float yNoktaTmp = fabs(yNokta);
+        yNoktaTmp -= kure.y;
+        icindeMi(xNokta, yNoktaTmp, zNokta, 0, 0, 0, kure.r);
+
+    }
+
+    else if(kure.x!=0 && kure.y==0 && kure.z==0){
+        float xNoktaTmp = fabs(xNokta);
+        xNoktaTmp -= kure.x;
+        icindeMi(xNoktaTmp, yNokta, zNokta, 0, 0, 0, kure.r);
+    }
+
+    else if(kure.x==0 && kure.y==0 && kure.z!=0){
+        float zNoktaTmp = fabs(zNokta);
+        zNoktaTmp -= kure.z;
+        icindeMi(xNokta, yNokta, zNoktaTmp, 0, 0, 0, kure.r);
+    }
+
+    else if(kure.x!=0 && kure.y!=0 && kure.z!=0){
+        float xNoktaTmp = fabs(xNokta);
+        xNoktaTmp -= kure.x;
+        float yNoktaTmp = fabs(yNokta);
+        yNoktaTmp -= kure.y;
+        float zNoktaTmp = fabs(zNokta);
+        zNoktaTmp -= kure.z;
+        icindeMi(xNoktaTmp, yNoktaTmp, zNoktaTmp, 0, 0, 0, kure.r);
+    }
+
+    else if(kure.x!=0 && kure.y!=0 && kure.z==0){
+        float xNoktaTmp = fabs(xNokta);
+        xNoktaTmp -= kure.x;
+        float yNoktaTmp = fabs(yNokta);
+        yNoktaTmp -= kure.y;
+        icindeMi(xNoktaTmp, yNoktaTmp, zNokta, 0, 0, 0, kure.r);
+    }
+
+    else if(kure.x!=0 && kure.y==0 && kure.z!=0){
+
+
+        float xNoktaTmp = fabs(xNokta);
+        xNoktaTmp -= kure.x;
+        float zNoktaTmp = fabs(zNokta);
+        zNoktaTmp -= kure.z;
+        icindeMi(xNoktaTmp, yNokta, zNoktaTmp, 0, 0, 0, kure.r);
+    }
+    else if(kure.x==0 && kure.y!=0 && kure.z!=0){
+        float yNoktaTmp = fabs(yNokta);
+        yNoktaTmp -= kure.y;
+        float zNoktaTmp = fabs(zNokta);
+        zNoktaTmp -= kure.z;
+        icindeMi(xNokta, yNoktaTmp, zNoktaTmp, 0, 0, 0, kure.r);
+    }
+
+}
+
+void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float zNokta){
+    float yaricap = kure.r;
+    float noktaninMerkezeUzakligi = sqrt( pow(xNokta-kure.x,2) + pow(yNokta-kure.y,2) + pow(zNokta-kure.z,2) );
+    if(noktaninMerkezeUzakligi<=yaricap){
+        printf("\n x=%f y=%f z=%f \n",xNokta,yNokta,zNokta);
+    }
+}
+
 void karsilamaEkrani();
 void islemSecim();
 void dosyaKontrol();
@@ -22,7 +121,7 @@ int main(int argc, char **argv)
 {
 	karsilamaEkrani();
 	islemSecim();
-	listdir("../",0);
+
 
 
 
@@ -31,7 +130,7 @@ int main(int argc, char **argv)
 
 
 
-
+/*
 void listdir(const char *name, int indent)
 {
     DIR *dir;
@@ -54,10 +153,11 @@ void listdir(const char *name, int indent)
     }
     closedir(dir);
 }
-
+*/
 
 
 void karsilamaEkrani(){
+
 	printf("Lutfen bir secim yapiniz: \n----------------------------------------- \n"
 	"	1.) Dosya Kontrolu \n"
 	"	2.) En Yakin/Uzak Noktalar \n"
@@ -81,9 +181,12 @@ void islemSecim(){
 			case 3: printf("3 secilmistir \n");
 			break;
 
-			case 4: printf("4 secilmistir \n");
+			case 4:{
+			struct kureYarat kure;
+			kureTanimla(&kure);
+			kureIciNoktalar2(kure,-3,-3,sqrt(6.9));
 			break;
-
+			}
 			case 5: printf("5 secilmistir \n");
 			break;
 
@@ -96,14 +199,14 @@ void islemSecim(){
 			break;
 	}
 }
-
+/*
 void dosyaKontrol(){
 
-<<<<<<< Updated upstream
+
 
 
 int uzaklik()//buraya 3 boyutlu noktalar arası uzaklık formülü yazılacak
-//https://fcvideo.info/20-analitik-geometri-uzayda-vekt%C3%B6rler-%C3%BC%C3%A7-boyutlu-uzayda-iki-nokta-aras%C4%B1ndaki-uzakl%C4%B1k_FanClubyeRncNjCC0I.html
-=======
+
+
 }
->>>>>>> Stashed changes
+*/
