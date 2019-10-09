@@ -5,9 +5,15 @@
 #include <string.h>
 #include <math.h>
 #include <windows.h>
+#include <conio.h>
 //batuhanin yazdigi kisim
 //ibr
 //alo
+
+void karsilamaEkrani();
+int islemSecim();
+void dosyaKontrol();
+void listdir();
 struct noktaBilgisi{
 	int i,j,k;
 	int r,g,b;
@@ -18,6 +24,13 @@ struct kureYarat{
     float y;
     float z;
     float r;
+};
+
+struct noktaVerileri{
+    double x;
+    double y;
+    double z;
+
 };
 
 void kureTanimla(struct kureYarat *kure){
@@ -36,7 +49,7 @@ void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure
     if(fabs(xNokta) <= xKure+rKure){ //x ekseninin sinirlarini belirledik
         if(fabs(yNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) ) ){//x'e gore y'nin max alabilecegi degeri belirledik
             if(fabs(zNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) - pow(yNokta,2)) ){//x ve y'ye gore z'nin max alabilecegi degeri belirledik
-                printf("\nx=%f y=%f z=%f",xNokta,yNokta,zNokta);
+                printf("x=%f y=%f z=%f",xNokta,yNokta,zNokta);
             }
         }
     }
@@ -88,6 +101,7 @@ void kureIciNoktalar1(struct kureYarat kure, float xNokta, float yNokta, float z
     else if(kure.x!=0 && kure.y==0 && kure.z!=0){
 
 
+
         float xNoktaTmp = fabs(xNokta);
         xNoktaTmp -= kure.x;
         float zNoktaTmp = fabs(zNokta);
@@ -108,17 +122,11 @@ void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float z
     float yaricap = kure.r;
     float noktaninMerkezeUzakligi = sqrt( pow(xNokta-kure.x,2) + pow(yNokta-kure.y,2) + pow(zNokta-kure.z,2) );
     if(noktaninMerkezeUzakligi<=yaricap){
-        printf("\n x=%f y=%f z=%f \n",xNokta,yNokta,zNokta);
+        printf("%f %f %f\n",xNokta,yNokta,zNokta);
     }
 }
 
-void karsilamaEkrani();
-void islemSecim();
-void dosyaKontrol();
-void listdir();
-
-int ListDirectoryContents(const char *sDir)
-{
+int ListDirectoryContents(const char *sDir){
     WIN32_FIND_DATA fdFile;
     HANDLE hFind = NULL;
 
@@ -164,15 +172,37 @@ int ListDirectoryContents(const char *sDir)
 
 
 
+
 int main(int argc, char **argv)
 {
-    ListDirectoryContents("./");
 
-	karsilamaEkrani();
-	islemSecim();
-    //listdir(".",0);
+    int satirSayisi =6;
+    struct noktaVerileri data[satirSayisi];
 
+    FILE *dosya;
+    dosya = fopen("deneme.txt","r");
+    if(dosya==NULL)
+    {
+        printf("File can not open!");
+    }
 
+    while(getc(dosya)!=EOF)
+    {
+        // The size of data[] will be change when we found the number of data lines.
+        for(int i=0; i<satirSayisi; i++)
+        {
+            fscanf(dosya,"%lf %lf %lf\n",&(data[i].x),&(data[i].y),&(data[i].z));
+        }
+    }
+    fclose(dosya);
+	while(1){
+    system("CLS");
+    karsilamaEkrani();
+	if(islemSecim(data,satirSayisi)==0)
+        break;
+	}
+	system("CLS");
+    printf("Programdan cikiliyor...");
 
 	return 0;
 }
@@ -207,21 +237,25 @@ void listdir(const char *name, int indent)
 
 void karsilamaEkrani(){
 
+
+
 	printf("Lutfen bir secim yapiniz: \n----------------------------------------- \n"
 	"	1.) Dosya Kontrolu \n"
 	"	2.) En Yakin/Uzak Noktalar \n"
-	"	3.) Tum Noktalari Icine Alan Küp \n"
+	"	3.) Tum Noktalari Icine Alan Kup \n"
 	"	4.) Kurenin Icindeki Noktalar \n"
 	"	5.) Nokta Uzakliklari Ortalamasi \n"
+	"	6.) Programi Sonlandir \n"
 	"-----------------------------------------\n"
-	"(Secim yapmak istediginiz isin numarisini girin Or:4): \n");
+	"(Secim yapmak istediginiz isin numarisini girin Or:4):  ");
 }
-void islemSecim(){
+int islemSecim(struct noktaVerileri data[6],int satirSayisi){
 	int secim;
+	int devam;
 	while(1){
 		scanf("%d", &secim);
 		switch(secim){
-			case 1: printf("1 secilmistir \n");
+			case 1: ListDirectoryContents("./");;
 			break;
 
 			case 2: printf("2 secilmistir \n");
@@ -231,31 +265,39 @@ void islemSecim(){
 			break;
 
 			case 4:{
+            system("CLS");
 			struct kureYarat kure;
 			kureTanimla(&kure);
-			kureIciNoktalar2(kure,-3,-3,sqrt(6.9));
+			system("CLS");
+			printf( "cx=%f\n"
+                    "cy=%f\n"
+                    "cz=%f\n"
+                    "cr=%f\n",kure.x,kure.y,kure.z,kure.r);
+			for(int i=0; i<satirSayisi; i++){
+                kureIciNoktalar2(kure,data[i].x,data[i].y,data[i].z);
+			}
 			break;
 			}
+
 			case 5: printf("5 secilmistir \n");
 			break;
+
+			case 6:
+            break;
 
 			default: printf("yanlis bir deger girdiniz (lutfen [1,5] arasi deger giriniz) \n");
 			secim=0;
 			break;
 
 		}
-		if(secim !=0)
+		if(secim !=0)//degeri yanlis girmezse switch case den cikiyor
 			break;
 	}
+	printf("\nYeni Islem Yapmak Icin 1 e basiniz");
+	scanf("%d",&devam);
+	if(secim==6 || devam!=1){
+        return 0;
+	}
+	return 1;
 }
-/*
-void dosyaKontrol(){
 
-
-
-
-int uzaklik()//buraya 3 boyutlu noktalar arası uzaklık formülü yazılacak
-
-
-}
-*/
