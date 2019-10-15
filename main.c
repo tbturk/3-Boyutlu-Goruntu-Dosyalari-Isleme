@@ -64,8 +64,7 @@ int main(int argc, char **argv) {
             karsilamaEkrani();
         }
         if(devam==0) {
-            if(fclose(dosya)==0)
-                system("CLS");
+            fclose(dosya);
             printf("\t\t\t\t%s kapandi\n\n",dosyaAdi);
         }
         printf("Baska Bir nkt Dosyasi Uzerinde Islem Yapmak Icin 1'e basin.");
@@ -78,6 +77,134 @@ int main(int argc, char **argv) {
     return 0;
 }
 
+    char cumle2[100];
+    char karakterGez[30];
+    fseek(dosya,boyut+5,SEEK_SET);
+    fgets(cumle2,100,dosya);
+    printf("%s",cumle2);
+    int boslukCount=0;
+    int cumle_boyut = strlen(cumle2);
+    for(int i=0; i<cumle_boyut; i++)
+    {
+        if(cumle2[i]==' ')
+        {
+            boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
+        }
+    }
+
+int baslikKontrol(FILE *dosya){
+    int hataSayisi=0;
+    int uzunlukAlan;
+    char noktaSayisi[10];
+    int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
+
+    char cumle[100];
+    strtok(cumle,"\n");
+
+    char n[7][100] = {"# Noktalar dosya format","VERSION 1","ALANLAR x y z r g b","ALANLAR x y z","NOKTALAR 10000","DATA ascii","DATA binary"};
+
+    int i=0;
+    int alanTmp=1;
+    char bosluk ='\n';
+    char *aranan1 = "ascii";
+    char *aranan2 = "binary";
+    int kontrolAscii = 0;
+    int kontrolBinary = 0;
+    for(i=0; i<5; i++){
+        fgets(cumle,50,dosya);
+        strtok(cumle,"\n");
+
+        if((strcmp(cumle,"\n"))==0 || strcmp(cumle," ")==0)
+        {
+            printf("%d. satirda bilgi kayiptir.",i+1);
+            hataSayisi++;
+            break;
+        }
+
+        if(i==0 && (strcmp(cumle,n[i])!=0))
+        {
+            printf("%d. satirda bilgi hatasi vardir!",i+1);
+            hataSayisi++;
+            break;
+        }
+
+        else if (i==1 && (strcmp(cumle,n[i])!=0))
+        {
+            printf("%d. satirda bilgi hatasi vardir.",i+1);
+            hataSayisi++;
+            break;
+        }
+
+        else if(i==2 && strcmp(cumle,n[2])!=0)
+        {
+            alanTmp=0;
+        }
+
+        if(i==2 && strcmp(cumle,n[3])!=0){
+            if(alanTmp==0){
+                printf("%d. satirda bilgi hatasi vardir.",i+1);
+                hataSayisi++;
+                break;
+            }
+        }
+        if(i==3){
+            for(int k=0; k<8; k++){
+                if(n[4][k]!=cumle[k]){
+                    printf("%d. satirda bilgi hatasi vardir.",i+1);
+                    printf("%c %c",n[4][k],cumle[k]);
+                    hataSayisi++;
+                    break;
+                }
+
+            }
+            uzunlukAlan=strlen(cumle);
+            int n=0;
+            for(int k=9;k<uzunlukAlan;k++){
+                noktaSayisi[n]=cumle[k];
+                n++;
+            }
+        }
+
+        if(i==4 && strstr(cumle,aranan1)!=NULL)
+        {
+            kontrolAscii = 1;
+        }
+
+        else if(i==4 && strstr(cumle,aranan2)!=NULL)
+        {
+            kontrolBinary = 1;
+        }
+
+    }
+    fseek(dosya,0,SEEK_SET);
+    int ch;
+    int satir_sayisi=1;
+
+    for(ch = fgetc(dosya); ch!=EOF; ch = getc(dosya))
+    {
+        if(ch == '\n')
+        {
+            satir_sayisi++;
+        }
+    }
+
+    int dosyaNoktaSayisi = satir_sayisi -6;
+    noktaSayisiInt = atoi(noktaSayisi);
+    if(noktaSayisiInt!=dosyaNoktaSayisi){
+        printf("Nokta veri sayisi hatali");
+        hataSayisi++;
+    }
+    if(hataSayisi==0){
+        printf("Dosyanin Baslik Bilgilerinde Herhangi Bir Hata Yoktur");
+        return 0;
+    }
+    else if(hataSayisi>0){
+        return 1;
+    }
+    //printf("%d %d",kontrolAscii,kontrolBinary);
+   // printf("\n%d %d",noktaSayisiInt,dosyaNoktaSayisi);
+
+}
 
 int klasoruListele(const char *konum) {
     struct dirent *entry;  // Pointer for directory entry
@@ -169,7 +296,7 @@ int nktKontrol(const char *konum) {
         return 0;
 }
 
-int islemSecim() {
+int islemSecim(char *dosyaAdi) {
 
     int secim;
     int devam;
@@ -177,8 +304,10 @@ int islemSecim() {
         scanf("%d", &secim);
         switch(secim) {
         case 1:
-            printf("1 secilmistir \n");
-            break;
+            if(baslikKontrol(dosya)==1)
+                return 0;
+            else
+                break;
 
         case 2:
             printf("2 secilmistir \n");
@@ -223,7 +352,6 @@ int islemSecim() {
     }
     return 1;
 }
-
 
 int dosyaKontrol(FILE *dosya) {
     int i=0;
