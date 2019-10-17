@@ -1,0 +1,7 @@
+# Noktalar dosya format
+VERSION 1
+ALANLAR x y z r g b
+NOKTALAR 1
+DATA ascii
+
+79.911334 51.105907 12.947192 95 223 13
