@@ -34,7 +34,8 @@ void kureTanimla(struct kureYarat *kure);
 void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure, float zKure, float rKure);
 void kureIciNoktalar1(struct kureYarat kure, float xNokta, float yNokta, float zNokta);
 void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float zNokta);
-void noktalarArasiUzaklik(struct noktaVerileri *data2[],int uzaklik);
+void noktalarArasiUzaklik();
+void noktalarArasiOrtalama();
 void dosyaAc(const char *konum);
 int klasoruListele(const char *konum);
 int noktaKontrol(FILE *dosya,int noktaSayisi);
@@ -44,6 +45,9 @@ FILE *dosya;
 int NktDosyaSayisi;
 int dosyaKapa; // islemSecim fonksiyonunda dosyaKontrol yapilmamis ise 2 degerini dondurur.
 struct noktaBilgisi *globalNoktalar;
+int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
+
+
 
 int main(int argc, char **argv) {
 
@@ -238,8 +242,6 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
     int hataSayisi=0;
     int uzunlukAlan;
     char noktaSayisi[10];
-    int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
-
     int kontrolAscii = 1;
     int kontrolBinary = 0;
     int cumleBoyut = 0;
@@ -540,9 +542,9 @@ int islemSecim(char *dosyaAdi) {
                         "cy=%f\n"
                         "cz=%f\n"
                         "cr=%f\n",kure.x,kure.y,kure.z,kure.r);
-                /*for(int i=0; i<satirSayisi; i++) {
-                    kureIciNoktalar2(kure,data[i].x,data[i].y,data[i].z);
-                }*/
+                for(int i=0; i<noktaSayisiInt; i++) {
+                    kureIciNoktalar2(kure,globalNoktalar[i].i,globalNoktalar[i].j,globalNoktalar[i].k);
+                }
                 break;
             }
         }
@@ -554,7 +556,7 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
-                printf("5 secilmistir \n");
+                noktalarArasiOrtalama();
                 break;
             }
         default:
@@ -588,7 +590,7 @@ void kureTanimla(struct kureYarat *kure) {
     printf("Kurenin yaricapini girin               :");
     scanf("%f",&kure->r);
 }
-
+/*
 void kureIciNoktalar1(struct kureYarat kure, float xNokta, float yNokta, float zNokta) {
 
 
@@ -662,7 +664,7 @@ void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure
         }
     }
 }
-
+*/
 void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float zNokta) {
     float yaricap = kure.r;
     float noktaninMerkezeUzakligi = sqrt( pow(xNokta-kure.x,2) + pow(yNokta-kure.y,2) + pow(zNokta-kure.z,2) );
@@ -670,8 +672,8 @@ void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float z
         printf("%f %f %f\n",xNokta,yNokta,zNokta);
     }
 }
-
-void noktalarArasiUzaklik(struct noktaVerileri *data2[],int uzaklik) {
+/*
+void noktalarArasiUzaklik() {
     int i,j;
     double karex;
     double karey;
@@ -732,26 +734,26 @@ void noktalarArasiUzaklik(struct noktaVerileri *data2[],int uzaklik) {
     printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",data2[yer4]->x,data2[yer4]->y,data2[yer4]->z);
 
 }
-
-void noktalarArasiOrtalama(struct noktaVerileri *data3[],int uzaklik) {
+*/
+void noktalarArasiOrtalama() {
     int i,j;
     double karex;
     double karey;
     double karez;
     int toplam_nokta=0;
 
-    double baslangicx = pow((data3[0]->x-data3[1]->x),2.0);
-    double baslangicy = pow((data3[0]->y-data3[1]->y),2.0);
-    double baslangicz = pow((data3[0]->z-data3[1]->z),2.0);
+    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2.0);
+    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2.0);
+    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2.0);
     double enb = sqrt(baslangicx+baslangicy+baslangicz);
     double temp_max = enb;
     double toplam = enb;
 
-    for(i=1; i<uzaklik; i++) {
-        for(j=i+1; j<uzaklik; j++) {
-            karex = pow((data3[i]->x-data3[j]->x),2.0);
-            karey = pow((data3[i]->y-data3[j]->y),2.0);
-            karez = pow((data3[i]->z-data3[j]->z),2.0);
+    for(i=1; i<noktaSayisiInt; i++) {
+        for(j=i+1; j<noktaSayisiInt; j++) {
+            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
+            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
+            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2.0);
             temp_max = sqrt(karex+karey+karez);
             toplam += temp_max; // This variable holds the all lengths between the dots.
             toplam_nokta++;     // This variable holds to number of lines.

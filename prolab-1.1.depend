@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1571525598 source:c:\users\bthn0\desktop\pro-lab-1-batuhan\main.c
+1571528446 source:c:\users\bthn0\desktop\pro-lab-1-batuhan\main.c
 	<stdio.h>
 	<unistd.h>
 	<stdlib.h>
