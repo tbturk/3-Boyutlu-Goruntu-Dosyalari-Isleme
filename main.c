@@ -89,16 +89,14 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-int noktaKontrol(FILE *dosya,int noktaSayisi)
-{
+int noktaKontrol(FILE *dosya,int noktaSayisi) {
     // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
 
     fseek(dosya,0,SEEK_SET);
     globalNoktalar = (struct noktaBilgisi*)malloc(noktaSayisi * sizeof(struct noktaBilgisi));
     char temp[50];
     int boyut=0;
-    for(int i=0; i<5; i++)
-    {
+    for(int i=0; i<5; i++) {
         fgets(temp,50,dosya);
         boyut += strlen(temp);
     }
@@ -107,28 +105,23 @@ int noktaKontrol(FILE *dosya,int noktaSayisi)
     fseek(dosya,boyut+5,SEEK_SET);
     int boslukCount;
     int satir2=6;
-    for(int i=0; i<noktaSayisi; i++)
-    {
+    for(int i=0; i<noktaSayisi; i++) {
         fgets(cumle2,100,dosya);
         strtok(cumle2,"\n");
         int cumle_boyut = strlen(cumle2);
         boslukCount=0;
-        for(int j=0; j<cumle_boyut; j++)
-        {
-            if(cumle2[j] == ' ')
-            {
+        for(int j=0; j<cumle_boyut; j++) {
+            if(cumle2[j] == ' ') {
                 boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
             }
         }
 
-        if(boslukCount<2)
-        {
+        if(boslukCount<2) {
             printf("\n%d. satirda Nokta verisi eksiktir",satir2);
             return 0;
         }
 
-        else if(boslukCount>2)
-        {
+        else if(boslukCount>2) {
             printf("\n%d. satirda Nokta verilerinde fazlalik vardir.",satir2);
             return 0;
         }
@@ -138,20 +131,18 @@ int noktaKontrol(FILE *dosya,int noktaSayisi)
 
     fseek(dosya,boyut,SEEK_SET);
 
-    while(getc(dosya)!=EOF)
-    {
+    while(getc(dosya)!=EOF) {
         // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
-        for(int i=0; i<noktaSayisi; i++)
-        {
+        for(int i=0; i<noktaSayisi; i++) {
             fscanf(dosya,"%lf %lf %lf\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k));
         }
     }
-/*
-    for(int i=0; i<noktaSayisi; i++)
-    {
-        printf("%lf %lf %lf\n",(globalNoktalar[i].i),(globalNoktalar[i].j),(globalNoktalar[i].k));
-    }
-*/
+    /*
+        for(int i=0; i<noktaSayisi; i++)
+        {
+            printf("%lf %lf %lf\n",(globalNoktalar[i].i),(globalNoktalar[i].j),(globalNoktalar[i].k));
+        }
+    */
 
 
 
@@ -379,8 +370,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
                         return 1;
                     } else
                         return 0;
-                }
-                else if(rgbMi==0){
+                } else if(rgbMi==0) {
                     if(noktaKontrol(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
                         return 1;
                     } else
@@ -514,7 +504,7 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
-                printf("2 secilmistir \n");
+                noktalarArasiUzaklik();
                 break;
             }
         case 3:
@@ -672,7 +662,7 @@ void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float z
         printf("%f %f %f\n",xNokta,yNokta,zNokta);
     }
 }
-/*
+
 void noktalarArasiUzaklik() {
     int i,j;
     double karex;
@@ -680,9 +670,9 @@ void noktalarArasiUzaklik() {
     double karez;
     int toplam_nokta=0;
 
-    double baslangicx = pow((data2[0]->x-data2[1]->x),2.0);
-    double baslangicy = pow((data2[0]->y-data2[1]->y),2.0);
-    double baslangicz = pow((data2[0]->z-data2[1]->z),2.0);
+    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2.0);
+    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2.0);
+    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2.0);
     double enk = sqrt(baslangicx+baslangicy+baslangicz);
     double enb = sqrt(baslangicx+baslangicy+baslangicz);
     double toplam = enb;
@@ -698,11 +688,11 @@ void noktalarArasiUzaklik() {
     double temp_min;
 
 
-    for(i=1; i<uzaklik; i++) {
-        for(j=i+1; j<uzaklik; j++) {
-            karex = pow((data2[i]->x-data2[j]->x),2.0);
-            karey = pow((data2[i]->y-data2[j]->y),2.0);
-            karez = pow((data2[i]->z-data2[j]->z),2.0);
+    for(i=1; i<noktaSayisiInt; i++) {
+        for(j=i+1; j<noktaSayisiInt; j++) {
+            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
+            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
+            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2.0);
             temp_min = sqrt(karex+karey+karez);
             temp_max = sqrt(karex+karey+karez);
             toplam += temp_max;
@@ -719,28 +709,27 @@ void noktalarArasiUzaklik() {
                 yer4 = j;
 
             }
-
         }
 
     }
 
     printf("Iki nokta arasi en buyuk uzaklik %lf\n",enb);
-    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",data2[yer1]->x,data2[yer1]->y,data2[yer1]->z);
-    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",data2[yer2]->x,data2[yer2]->y,data2[yer2]->z);
+    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",globalNoktalar[yer1].i,globalNoktalar[yer1].j,globalNoktalar[yer1].k);
+    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer2].i,globalNoktalar[yer2].j,globalNoktalar[yer2].k);
 
 
     printf("Iki nokta arasi en kucuk uzaklik %lf\n",enk);
-    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",data2[yer3]->x,data2[yer3]->y,data2[yer3]->z);
-    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",data2[yer4]->x,data2[yer4]->y,data2[yer4]->z);
+    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",globalNoktalar[yer3].i,globalNoktalar[yer3].j,globalNoktalar[yer3].k);
+    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer4].i,globalNoktalar[yer4].j,globalNoktalar[yer4].k);
 
 }
-*/
+
 void noktalarArasiOrtalama() {
     int i,j;
     double karex;
     double karey;
     double karez;
-    int toplam_nokta=0;
+    double toplam_nokta=0;
 
     double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2.0);
     double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2.0);
@@ -749,7 +738,7 @@ void noktalarArasiOrtalama() {
     double temp_max = enb;
     double toplam = enb;
 
-    for(i=1; i<noktaSayisiInt; i++) {
+    for(i=1; i<noktaSayisiInt-1; i++) {
         for(j=i+1; j<noktaSayisiInt; j++) {
             karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
             karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
