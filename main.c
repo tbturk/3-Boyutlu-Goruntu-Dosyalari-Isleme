@@ -7,9 +7,21 @@
 #include <math.h>
 #include <conio.h>
 
-struct noktaBilgisi {
-    double i,j,k;
-    int r,g,b;
+struct noktaBilgisiRGB {
+    double i;
+    double j;
+    double k;
+    int r;
+    int g;
+    int b;
+};
+struct noktaBilgisiBinaryRGB {
+    float i;
+    float j;
+    float k;
+    int r;
+    int g;
+    int b;
 };
 
 struct kureYarat {
@@ -19,10 +31,10 @@ struct kureYarat {
     float r;
 };
 
-struct noktaVerileri {
-    double x;
-    double y;
-    double z;
+struct noktaBilgisiXYZ {
+    float x;
+    float y;
+    float z;
 
 };
 
@@ -38,13 +50,14 @@ void noktalarArasiUzaklik();
 void noktalarArasiOrtalama();
 void dosyaAc(const char *konum);
 int klasoruListele(const char *konum);
-int noktaKontrol(FILE *dosya,int noktaSayisi);
-int noktaKontrolRgb(FILE *dosya,int noktaSayisi);
+int noktaKontrolAsciiXYZ(FILE *dosya,int noktaSayisi);
+int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi);
+int noktaKontrolBinaryXYZ(FILE *dosya,int rgb);
 void dosyaSecim(char *dosyaAdi);//Dosya sectirir. Secilen dosyanýn ismini dosyaAdina atar.
 FILE *dosya;
 int NktDosyaSayisi;
 int dosyaKapa; // islemSecim fonksiyonunda dosyaKontrol yapilmamis ise 2 degerini dondurur.
-struct noktaBilgisi *globalNoktalar;
+struct noktaBilgisiRGB *globalNoktalar;
 int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
 
 
@@ -89,12 +102,13 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-int noktaKontrol(FILE *dosya,int noktaSayisi) {
+int noktaKontrolAsciiXYZ(FILE *dosya,int noktaSayisi) {
     // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
 
     fseek(dosya,0,SEEK_SET);
-    globalNoktalar = (struct noktaBilgisi*)malloc(noktaSayisi * sizeof(struct noktaBilgisi));
+    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisi * sizeof(struct noktaBilgisiRGB));
     char temp[50];
+
     int boyut=0;
     for(int i=0; i<5; i++) {
         fgets(temp,50,dosya);
@@ -149,10 +163,10 @@ int noktaKontrol(FILE *dosya,int noktaSayisi) {
     return 1;
 
 }
-int noktaKontrolRgb(FILE *dosya,int noktaSayisi) {
+int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi) {
     // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
     fseek(dosya,0,SEEK_SET);
-    globalNoktalar = (struct noktaBilgisi*)malloc(noktaSayisi * sizeof(struct noktaBilgisi));
+    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisi * sizeof(struct noktaBilgisiRGB));
     char temp[50];
     int boyut=0;
     for(int i=0; i<5; i++) {
@@ -366,12 +380,12 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
             if(hataSayisi==0) {
                 printf("\nDosyanin Baslik Bilgilerinde Herhangi Bir Hata Yoktur");
                 if(rgbMi==1) {
-                    if(noktaKontrolRgb(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                    if(noktaKontrolAsciiRGB(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
                         return 1;
                     } else
                         return 0;
                 } else if(rgbMi==0) {
-                    if(noktaKontrol(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                    if(noktaKontrolAsciiXYZ(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
                         return 1;
                     } else
                         return 0;
@@ -379,22 +393,120 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
 
             } else
                 return 0;
-        } else if(kontrolBinary==1) {
+        }
+
+        else if(kontrolBinary==1) {
             fclose(dosya);
             dosya = fopen(dosyaAdi,"rb");
             if(dosya==NULL) {
                 printf("Dosya Binary Modunda Tekrar Acilamadi!");
+                return 0;
             } else
                 printf("Dosya Binary Modunda Tekrar Acildi!");
-            return 1;
+
+            if(rgbMi==0) {
+                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1)
+                    return 1;
+                else
+                    return 0;
+            } else if(rgbMi==1) {
+                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1)
+                    return 1;
+                else
+                    return 0;
+            }
+
+            else
+                return 0;
+
         }
 
+        return 1;
     }
 
     else
         return 0;
 
 }
+
+int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
+    fseek(dosya,0,SEEK_SET);
+    int sayac=0;
+    while(1) {
+        struct noktaBilgisiXYZ noktalarIlk;
+        size_t sayi = fread(&noktalarIlk,sizeof(struct noktaBilgisiXYZ),1,dosya);
+        if(sayi<1)
+            break;
+        sayac++;
+    }
+
+    noktaSayisiInt=sayac-6;
+    fseek(dosya,0,SEEK_SET);
+    char temp[50];
+    int boyut=0;
+    for(int i=0; i<5; i++) {
+        fgets(temp,50,dosya);
+        boyut += strlen(temp);
+    }
+    fseek(dosya,boyut,SEEK_SET);
+    char c;
+    int dosyaBoyut=0;
+    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisiInt * sizeof(struct noktaBilgisiRGB));
+    while((c=fgetc(dosya))!=EOF) {
+        dosyaBoyut++;
+    }
+    //printf("%d\n",dosyaBoyut);
+    if(rgb==0) {
+        if(dosyaBoyut%12!=0) {
+            printf("\nBaslik Bilgisi Ile Nokta Sayisi Uyusmuyor\n");
+            return 0;
+        }//nokta kontrolu hataliysa cikar.
+
+        fseek(dosya,0,SEEK_SET);
+        fseek(dosya,boyut,SEEK_SET);
+        int sayac1=0;
+        while(1) {
+            struct noktaBilgisiXYZ noktalar;
+            size_t sayi = fread(&noktalar,sizeof(struct noktaBilgisiXYZ),1,dosya);
+            if(sayi<1)
+                break;
+            globalNoktalar[sayac1].i=(double)noktalar.x;
+            globalNoktalar[sayac1].j=(double)noktalar.y;
+            globalNoktalar[sayac1].k=(double)noktalar.z;
+            printf("\n%lf %lf %lf\n",globalNoktalar[sayac1].i,globalNoktalar[sayac1].j,globalNoktalar[sayac1].k);
+            sayac1++;
+        }
+        //printf("%d",noktaSayisiInt);
+        return 1;
+    } else if(rgb==1) {
+        printf("%d",dosyaBoyut);
+        if(dosyaBoyut%24!=0) {
+            printf("\nBaslik Bilgisi Ile Nokta Sayisi Uyusmuyor\n");
+            return 0;
+        }//nokta kontrolu hataliysa cikar.
+
+        fseek(dosya,0,SEEK_SET);
+        fseek(dosya,boyut,SEEK_SET);
+        int sayac1=0;
+        while(1) {
+            struct noktaBilgisiBinaryRGB noktalar;
+            size_t sayi = fread(&noktalar,sizeof(struct noktaBilgisiBinaryRGB),1,dosya);
+            if(sayi<1)
+                break;
+            globalNoktalar[sayac1].i=noktalar.i;
+            globalNoktalar[sayac1].j=noktalar.j;
+            globalNoktalar[sayac1].k=noktalar.k;
+            globalNoktalar[sayac1].r=noktalar.r;
+            globalNoktalar[sayac1].g=noktalar.g;
+            globalNoktalar[sayac1].b=noktalar.b;
+            printf("\n%lf %lf %lf %d %d %d\n",globalNoktalar[sayac1].i,globalNoktalar[sayac1].j,globalNoktalar[sayac1].k,noktalar.r,globalNoktalar[sayac1].g,globalNoktalar[sayac1].b);
+            sayac1++;
+        }
+        //printf("%d",noktaSayisiInt);
+        return 1;
+    }
+}
+
 
 int klasoruListele(const char *konum) {
     struct dirent *entry;  // Pointer for directory entry
@@ -675,7 +787,7 @@ void noktalarArasiUzaklik() {
     double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2.0);
     double enk = sqrt(baslangicx+baslangicy+baslangicz);
     double enb = sqrt(baslangicx+baslangicy+baslangicz);
-    double toplam = enb;
+    double toplam = 0;
 
     int yer1=0;
     int yer2=0;
@@ -683,28 +795,27 @@ void noktalarArasiUzaklik() {
     int yer4=0;
 
     //temp about maximum value
-    double temp_max;
+    double temp_sayi;
     //temp about minimum value
-    double temp_min;
+    //double temp_min;
 
 
-    for(i=1; i<noktaSayisiInt; i++) {
+    for(i=0; i<noktaSayisiInt-1; i++) {
         for(j=i+1; j<noktaSayisiInt; j++) {
             karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
             karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
             karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2.0);
-            temp_min = sqrt(karex+karey+karez);
-            temp_max = sqrt(karex+karey+karez);
-            toplam += temp_max;
+            temp_sayi = sqrt(karex+karey+karez);
+            toplam += temp_sayi;
             toplam_nokta++;
-            if(enk > temp_min) {
-                enk = temp_min;
+            if(enk > temp_sayi) {
+                enk = temp_sayi;
                 yer1 = i;
                 yer2 = j;
 
             }
-            if(enb < temp_max) {
-                enb = temp_max;
+            if(enb < temp_sayi) {
+                enb = temp_sayi;
                 yer3 = i;
                 yer4 = j;
 
