@@ -14,11 +14,9 @@ struct noktaBilgisiRGB {
     int r;
     int g;
     int b;
+
 };
 struct noktaBilgisiBinaryRGB {
-    float i;
-    float j;
-    float k;
     int r;
     int g;
     int b;
@@ -55,17 +53,21 @@ int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi);
 int noktaKontrolBinaryXYZ(FILE *dosya,int rgb);
 void dosyaSecim(char *dosyaAdi);//Dosya sectirir. Secilen dosyanýn ismini dosyaAdina atar.
 FILE *dosya;
+FILE *output;
 int NktDosyaSayisi;
 int dosyaKapa; // islemSecim fonksiyonunda dosyaKontrol yapilmamis ise 2 degerini dondurur.
 struct noktaBilgisiRGB *globalNoktalar;
 int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
-
+int rgbMi=3; // rgb dosyasi olup olmadigini tutar
+int dataVeri;// 1 ise ascii 0 ise binary
 
 
 int main(int argc, char **argv) {
-
     int devam;
     int yeniNkt=1;
+
+    output = fopen("output.nkt","a");
+
     int dosyaUzunlugu;
     while(yeniNkt==1) {
         system("CLS");
@@ -76,11 +78,15 @@ int main(int argc, char **argv) {
         }
         char dosyaAdi[dosyaUzunlugu];
         dosyaSecim(dosyaAdi);
+        fprintf(output,"\t\t%s dosyasi uzerinde calisiliyor...\n",dosyaAdi);
         dosyaAc(dosyaAdi);
         karsilamaEkrani();
         devam=1;
         dosyaKapa=2;//her nkt'de dosyaKontrol'u sorgulamasi icin
 
+        char outputAdi[dosyaUzunlugu+6];
+        strcpy(outputAdi,"output");
+        strcat(outputAdi,dosyaAdi);
         while(devam==1) {
             devam=islemSecim(dosyaAdi);
             if(devam==1) {
@@ -97,7 +103,7 @@ int main(int argc, char **argv) {
         scanf("%d",&yeniNkt);
 
     }
-
+    fclose(output);
     printf("\t\t\t\t\tProgramdan cikiliyor...");
 
     return 0;
@@ -151,15 +157,6 @@ int noktaKontrolAsciiXYZ(FILE *dosya,int noktaSayisi) {
             fscanf(dosya,"%lf %lf %lf\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k));
         }
     }
-    /*
-        for(int i=0; i<noktaSayisi; i++)
-        {
-            printf("%lf %lf %lf\n",(globalNoktalar[i].i),(globalNoktalar[i].j),(globalNoktalar[i].k));
-        }
-    */
-
-
-
     return 1;
 
 }
@@ -213,12 +210,6 @@ int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi) {
     }
 
 
-    /*
-        for(int i=0; i<noktaSayisi; i++)
-        {
-            printf("%lf %lf %lf %d %d %d\n",globalNoktalar[i].i,globalNoktalar[i].j,globalNoktalar[i].k,globalNoktalar[i].r,globalNoktalar[i].g,globalNoktalar[i].b);
-        }
-    */
     int satir=6;
 
     for(int i=0; i<noktaSayisi; i++) {
@@ -265,9 +256,11 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
 
     if(strstr(cumleData,"ascii")) {
         kontrolAscii = 1;
+        dataVeri = 1;
     } else if(strstr(cumleData,"binary")) {
         kontrolAscii = 0;
         kontrolBinary = 1;
+        dataVeri = 0;
     } else {
         hataSayisi++;
     }
@@ -285,25 +278,27 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
     int alanTmp=1;
     int dataTmp=1;
     char bosluk ='\n';
-    int rgbMi=3; // rgb dosyasi olup olmadigini tutar
     for(i=0; i<5; i++) { //baslik kontrol ediyor ve rgb ise 1 donduruyor, ayrıca ascii mi binary mi onu donduruyor.
         fgets(cumle,50,dosya);
         strtok(cumle,"\n");
 
         if((strcmp(cumle,"\n"))==0 || strcmp(cumle," ")==0) {
             printf("\n%d. satirda bilgi hatasi vardir.",i+1);
+            fprintf(output,"%d. satirda bilgi hatasi vardir.\n",i+1);
             hataSayisi++;
             break;
         }
 
         if(i==0 && (strcmp(cumle,n[i])!=0)) {
             printf("\n%d. satirda baslik bilgisi hatalidir.",i+1);
+            fprintf(output,"%d. satirda baslik bilgisi hatalidir.\n",i+1);
             hataSayisi++;
             break;
         }
 
         else if (i==1 && (strcmp(cumle,n[i])!=0)) {
             printf("\n%d. satirda baslik bilgisi hatalidir.",i+1);
+            fprintf(output,"%d. satirda baslik bilgisi hatalidir.\n",i+1);
             hataSayisi++;
             break;
         }
@@ -315,6 +310,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
         if(i==2 && strcmp(cumle,n[3])!=0) {
             if(alanTmp==0) {
                 printf("\n%d. satirda baslik bilgisi hatalidir.",i+1);
+                fprintf(output,"%d. satirda baslik bilgisi hatalidir.\n",i+1);
                 hataSayisi++;
                 break;
             }
@@ -328,6 +324,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
             for(int k=0; k<8; k++) {
                 if(n[4][k]!=cumle[k]) {
                     printf("\n%d. satirda baslik bilgisi hatalidir.",i+1);
+                    fprintf(output,"%d. satirda baslik bilgisi hatalidir.\n",i+1);
                     printf("%c %c",n[4][k],cumle[k]);
                     hataSayisi++;
                     break;
@@ -349,6 +346,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
         if(i==4 && strcmp(cumle,n[6])!=0) {
             if(dataTmp==0) {
                 printf("\n%d. satirda baslik bilgisi hatalidir.",i+1);
+                fprintf(output,"%d. satirda baslik bilgisi hatalidir.\n",i+1);
                 hataSayisi++;
                 break;
             }
@@ -359,7 +357,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
     //printf("\nbinary %d\nascii %d",kontrolBinary,kontrolAscii); //dosyanin binary mi ascii mi oldugunu ekrana basar.
 
     fseek(dosya,0,SEEK_SET);
-    printf("%d",hataSayisi);
+    //printf("%d",hataSayisi);
     if(hataSayisi==0) {
         if(kontrolAscii==1) {
             int ch;
@@ -370,10 +368,11 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
                     satir_sayisi++;
                 }
             }
-            int dosyaNoktaSayisi = satir_sayisi -6;
+            int dosyaNoktaSayisi = satir_sayisi -5;
             noktaSayisiInt = atoi(noktaSayisi);
             if(noktaSayisiInt!=dosyaNoktaSayisi) {
                 printf("\nVerilen Nokta Sayilari Hatali");
+                fputs("Veriler dosyada verilen sayilarla uyusmamaktadir.\n\n",output);
                 hataSayisi++;
             }
             fseek(dosya,0,SEEK_SET);
@@ -381,18 +380,26 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
                 printf("\nDosyanin Baslik Bilgilerinde Herhangi Bir Hata Yoktur");
                 if(rgbMi==1) {
                     if(noktaKontrolAsciiRGB(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                        fputs("Tum dosyalar uyumludur\n",output);
                         return 1;
-                    } else
+                    } else {
                         return 0;
+                        fputs("Dosyalar uyumlu degildir.\n\n",output);
+                    }
                 } else if(rgbMi==0) {
                     if(noktaKontrolAsciiXYZ(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                        fputs("Tum dosyalar uyumludur\n",output);
                         return 1;
-                    } else
+                    } else {
+                        fputs("Dosyalar uyumlu degildir.\n\n",output);
                         return 0;
+                    }
                 }
 
-            } else
+            } else {
+                fputs("Dosyalar uyumlu degildir.\n\n",output);
                 return 0;
+            }
         }
 
         else if(kontrolBinary==1) {
@@ -405,49 +412,73 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
                 printf("Dosya Binary Modunda Tekrar Acildi!");
 
             if(rgbMi==0) {
-                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1)
+                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1) {
+                    fputs("Tum dosyalar uyumludur.\n",output);
                     return 1;
-                else
+                } else {
+                    fputs("Dosyalar uyumlu degildir.\n\n",output);
                     return 0;
+                }
             } else if(rgbMi==1) {
-                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1)
+                if(noktaKontrolBinaryXYZ(dosya,rgbMi)==1) {
+                    fputs("Tum dosyalar uyumludur.\n",output);
                     return 1;
-                else
+                } else {
+                    fputs("Dosyalar uyumlu degildir.\n\n",output);
                     return 0;
+                }
             }
 
-            else
+            else {
+                fputs("Dosyalar uyumlu degildir.\n\n",output);
                 return 0;
+            }
 
         }
 
+        fputs("Tum dosyalar uyumludur.\n",output);
         return 1;
     }
 
-    else
+    else {
+        fputs("Dosyalar uyumlu degildir.\n\n",output);
         return 0;
+    }
 
 }
 
 int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
     fseek(dosya,0,SEEK_SET);
     int sayac=0;
-    while(1) {
-        struct noktaBilgisiXYZ noktalarIlk;
-        size_t sayi = fread(&noktalarIlk,sizeof(struct noktaBilgisiXYZ),1,dosya);
-        if(sayi<1)
-            break;
-        sayac++;
-    }
-
-    noktaSayisiInt=sayac-6;
-    fseek(dosya,0,SEEK_SET);
     char temp[50];
     int boyut=0;
     for(int i=0; i<5; i++) {
         fgets(temp,50,dosya);
         boyut += strlen(temp);
     }
+    fseek(dosya,boyut,SEEK_SET);
+    if(rgb==0) {
+        while(1) {
+            struct noktaBilgisiXYZ noktalarIlk;
+            size_t sayi = fread(&noktalarIlk,sizeof(struct noktaBilgisiXYZ),1,dosya);
+            if(sayi<1)
+                break;
+            sayac++;
+        }
+    } else if(rgb==1) {
+        while(1) {
+            struct noktaBilgisiBinaryRGB noktalarIlk;
+            size_t sayi = fread(&noktalarIlk,sizeof(struct noktaBilgisiBinaryRGB),1,dosya);
+            if(sayi<1)
+                break;
+            sayac++;
+        }
+        sayac/=2;
+    }
+
+    printf("\n%d\n",sayac);
+    noktaSayisiInt=sayac;
+
     fseek(dosya,boyut,SEEK_SET);
     char c;
     int dosyaBoyut=0;
@@ -485,24 +516,25 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
             return 0;
         }//nokta kontrolu hataliysa cikar.
 
-        fseek(dosya,0,SEEK_SET);
         fseek(dosya,boyut,SEEK_SET);
         int sayac1=0;
-        while(1) {
-            struct noktaBilgisiBinaryRGB noktalar;
-            size_t sayi = fread(&noktalar,sizeof(struct noktaBilgisiBinaryRGB),1,dosya);
-            if(sayi<1)
-                break;
-            globalNoktalar[sayac1].i=noktalar.i;
-            globalNoktalar[sayac1].j=noktalar.j;
-            globalNoktalar[sayac1].k=noktalar.k;
-            globalNoktalar[sayac1].r=noktalar.r;
-            globalNoktalar[sayac1].g=noktalar.g;
-            globalNoktalar[sayac1].b=noktalar.b;
-            printf("\n%lf %lf %lf %d %d %d\n",globalNoktalar[sayac1].i,globalNoktalar[sayac1].j,globalNoktalar[sayac1].k,noktalar.r,globalNoktalar[sayac1].g,globalNoktalar[sayac1].b);
+        for(int dolas=0; dolas<noktaSayisiInt; dolas++) {
+            struct noktaBilgisiXYZ noktalar;
+            struct noktaBilgisiBinaryRGB noktalar1;
+            fread(&noktalar,sizeof(struct noktaBilgisiXYZ),1,dosya);
+            fread(&noktalar1,sizeof(struct noktaBilgisiBinaryRGB),1,dosya);
+
+            printf("\n%f %f %f %d %d %d",noktalar.x,noktalar.y,noktalar.z,noktalar1.r,noktalar1.g,noktalar1.b);
+            globalNoktalar[sayac1].i=noktalar.x;
+            globalNoktalar[sayac1].j=noktalar.y;
+            globalNoktalar[sayac1].k=noktalar.z;
+            globalNoktalar[sayac1].r=noktalar1.r;
+            globalNoktalar[sayac1].g=noktalar1.g;
+            globalNoktalar[sayac1].b=noktalar1.b;
+            //printf("\n%lf %lf %lf %d %d %d\n",globalNoktalar[sayac1].i,globalNoktalar[sayac1].j,globalNoktalar[sayac1].k,noktalar.r,globalNoktalar[sayac1].g,globalNoktalar[sayac1].b);
             sayac1++;
         }
-        //printf("%d",noktaSayisiInt);
+        printf("%d",noktaSayisiInt);
         return 1;
     }
 }
@@ -606,6 +638,7 @@ int islemSecim(char *dosyaAdi) {
         scanf("%d", &secim);
         switch(secim) {
         case 1:
+            fputs("SECIM 1\n",output);
             dosyaKapa = dosyaKontrol(dosya,dosyaAdi);//dosyada hata varsa dondurecek deger
             break;
 
@@ -616,6 +649,7 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
+                fputs("SECIM 2\n",output);
                 noktalarArasiUzaklik();
                 break;
             }
@@ -626,7 +660,8 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
-                printf("3 secilmistir \n");
+                fputs("SECIM 3\n",output);
+                kupBul();
                 break;
             }
         case 4: {
@@ -636,6 +671,7 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
+                fputs("SECIM 4\n",output);
                 system("CLS");
                 struct kureYarat kure;
                 kureTanimla(&kure);
@@ -644,6 +680,24 @@ int islemSecim(char *dosyaAdi) {
                         "cy=%f\n"
                         "cz=%f\n"
                         "cr=%f\n",kure.x,kure.y,kure.z,kure.r);
+
+                fprintf(output,"cx=%f\n"
+                        "cy=%f\n"
+                        "cz=%f\n"
+                        "cr=%f\n",kure.x,kure.y,kure.z,kure.r);
+                if(rgbMi=1) {
+                    fputs("ALANLAR x y z r g b\n",output);
+                } else {
+                    fputs("ALANLAR x y z\n",output);
+                }
+
+                fprintf(output,"NOKTALAR %d\n",noktaSayisiInt);
+
+                if(dataVeri=1) {
+                    fputs("DATA ascii\n",output);
+                } else {
+                    fputs("DATA binary\n",output);
+                }
                 for(int i=0; i<noktaSayisiInt; i++) {
                     kureIciNoktalar2(kure,globalNoktalar[i].i,globalNoktalar[i].j,globalNoktalar[i].k);
                 }
@@ -658,6 +712,7 @@ int islemSecim(char *dosyaAdi) {
                 secim=0;
                 break;
             } else {
+                fputs("SECIM 5\n",output);
                 noktalarArasiOrtalama();
                 break;
             }
@@ -692,86 +747,13 @@ void kureTanimla(struct kureYarat *kure) {
     printf("Kurenin yaricapini girin               :");
     scanf("%f",&kure->r);
 }
-/*
-void kureIciNoktalar1(struct kureYarat kure, float xNokta, float yNokta, float zNokta) {
 
-
-
-    if(kure.x==0 && kure.y==0 && kure.z==0) {
-        icindeMi(xNokta, yNokta, zNokta, kure.x, kure.y, kure.z, kure.r);
-    }
-
-    else if(kure.x==0 && kure.y!=0 && kure.z==0) {
-        float yNoktaTmp = fabs(yNokta);
-        yNoktaTmp -= kure.y;
-        icindeMi(xNokta, yNoktaTmp, zNokta, 0, 0, 0, kure.r);
-
-    }
-
-    else if(kure.x!=0 && kure.y==0 && kure.z==0) {
-        float xNoktaTmp = fabs(xNokta);
-        xNoktaTmp -= kure.x;
-        icindeMi(xNoktaTmp, yNokta, zNokta, 0, 0, 0, kure.r);
-    }
-
-    else if(kure.x==0 && kure.y==0 && kure.z!=0) {
-        float zNoktaTmp = fabs(zNokta);
-        zNoktaTmp -= kure.z;
-        icindeMi(xNokta, yNokta, zNoktaTmp, 0, 0, 0, kure.r);
-    }
-
-    else if(kure.x!=0 && kure.y!=0 && kure.z!=0) {
-        float xNoktaTmp = fabs(xNokta);
-        xNoktaTmp -= kure.x;
-        float yNoktaTmp = fabs(yNokta);
-        yNoktaTmp -= kure.y;
-        float zNoktaTmp = fabs(zNokta);
-        zNoktaTmp -= kure.z;
-        icindeMi(xNoktaTmp, yNoktaTmp, zNoktaTmp, 0, 0, 0, kure.r);
-    }
-
-    else if(kure.x!=0 && kure.y!=0 && kure.z==0) {
-        float xNoktaTmp = fabs(xNokta);
-        xNoktaTmp -= kure.x;
-        float yNoktaTmp = fabs(yNokta);
-        yNoktaTmp -= kure.y;
-        icindeMi(xNoktaTmp, yNoktaTmp, zNokta, 0, 0, 0, kure.r);
-    }
-
-    else if(kure.x!=0 && kure.y==0 && kure.z!=0) {
-
-
-
-        float xNoktaTmp = fabs(xNokta);
-        xNoktaTmp -= kure.x;
-        float zNoktaTmp = fabs(zNokta);
-        zNoktaTmp -= kure.z;
-        icindeMi(xNoktaTmp, yNokta, zNoktaTmp, 0, 0, 0, kure.r);
-    } else if(kure.x==0 && kure.y!=0 && kure.z!=0) {
-        float yNoktaTmp = fabs(yNokta);
-        yNoktaTmp -= kure.y;
-        float zNoktaTmp = fabs(zNokta);
-        zNoktaTmp -= kure.z;
-        icindeMi(xNokta, yNoktaTmp, zNoktaTmp, 0, 0, 0, kure.r);
-    }
-
-}
-
-void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure, float zKure, float rKure) {
-    if(fabs(xNokta) <= xKure+rKure) { //x ekseninin sinirlarini belirledik
-        if(fabs(yNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) ) ) { //x'e gore y'nin max alabilecegi degeri belirledik
-            if(fabs(zNokta) <= sqrt( pow(rKure,2) - pow(xNokta,2) - pow(yNokta,2)) ) { //x ve y'ye gore z'nin max alabilecegi degeri belirledik
-                printf("x=%f y=%f z=%f",xNokta,yNokta,zNokta);
-            }
-        }
-    }
-}
-*/
 void kureIciNoktalar2(struct kureYarat kure, float xNokta, float yNokta, float zNokta) {
     float yaricap = kure.r;
     float noktaninMerkezeUzakligi = sqrt( pow(xNokta-kure.x,2) + pow(yNokta-kure.y,2) + pow(zNokta-kure.z,2) );
     if(noktaninMerkezeUzakligi<=yaricap) {
         printf("%f %f %f\n",xNokta,yNokta,zNokta);
+        fprintf(output,"%f %f %f\n",xNokta,yNokta,zNokta);
     }
 }
 
@@ -782,9 +764,9 @@ void noktalarArasiUzaklik() {
     double karez;
     int toplam_nokta=0;
 
-    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2.0);
-    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2.0);
-    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2.0);
+    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2);
+    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2);
+    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2);
     double enk = sqrt(baslangicx+baslangicy+baslangicz);
     double enb = sqrt(baslangicx+baslangicy+baslangicz);
     double toplam = 0;
@@ -800,11 +782,11 @@ void noktalarArasiUzaklik() {
     //double temp_min;
 
 
-    for(i=0; i<noktaSayisiInt-1; i++) {
+    for(i=1; i<noktaSayisiInt-1; i++) {
         for(j=i+1; j<noktaSayisiInt; j++) {
-            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
-            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
-            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2.0);
+            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2);
+            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2);
+            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2);
             temp_sayi = sqrt(karex+karey+karez);
             toplam += temp_sayi;
             toplam_nokta++;
@@ -825,14 +807,16 @@ void noktalarArasiUzaklik() {
     }
 
     printf("Iki nokta arasi en buyuk uzaklik %lf\n",enb);
-    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",globalNoktalar[yer1].i,globalNoktalar[yer1].j,globalNoktalar[yer1].k);
-    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer2].i,globalNoktalar[yer2].j,globalNoktalar[yer2].k);
-
-
-    printf("Iki nokta arasi en kucuk uzaklik %lf\n",enk);
     printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",globalNoktalar[yer3].i,globalNoktalar[yer3].j,globalNoktalar[yer3].k);
     printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer4].i,globalNoktalar[yer4].j,globalNoktalar[yer4].k);
 
+
+    printf("Iki nokta arasi en kucuk uzaklik %lf\n",enk);
+    printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf\n",globalNoktalar[yer1].i,globalNoktalar[yer1].j,globalNoktalar[yer1].k);
+    printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer2].i,globalNoktalar[yer2].j,globalNoktalar[yer2].k);
+
+    fprintf(output,"%lf %lf %lf\n%lf %lf %lf\n",globalNoktalar[yer1].i,globalNoktalar[yer1].j,globalNoktalar[yer1].k,globalNoktalar[yer2].i,globalNoktalar[yer2].j,globalNoktalar[yer2].k);
+    fprintf(output,"%lf %lf %lf\n%lf %lf %lf\n",globalNoktalar[yer3].i,globalNoktalar[yer3].j,globalNoktalar[yer3].k,globalNoktalar[yer4].i,globalNoktalar[yer4].j,globalNoktalar[yer4].k);
 }
 
 void noktalarArasiOrtalama() {
@@ -842,18 +826,18 @@ void noktalarArasiOrtalama() {
     double karez;
     double toplam_nokta=0;
 
-    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2.0);
-    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2.0);
-    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2.0);
+    double baslangicx = pow((globalNoktalar[0].i-globalNoktalar[1].i),2);
+    double baslangicy = pow((globalNoktalar[0].j-globalNoktalar[1].j),2);
+    double baslangicz = pow((globalNoktalar[0].k-globalNoktalar[1].k),2);
     double enb = sqrt(baslangicx+baslangicy+baslangicz);
     double temp_max = enb;
     double toplam = enb;
 
     for(i=1; i<noktaSayisiInt-1; i++) {
         for(j=i+1; j<noktaSayisiInt; j++) {
-            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2.0);
-            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2.0);
-            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2.0);
+            karex = pow((globalNoktalar[i].i-globalNoktalar[j].i),2);
+            karey = pow((globalNoktalar[i].j-globalNoktalar[j].j),2);
+            karez = pow((globalNoktalar[i].k-globalNoktalar[j].k),2);
             temp_max = sqrt(karex+karey+karez);
             toplam += temp_max; // This variable holds the all lengths between the dots.
             toplam_nokta++;     // This variable holds to number of lines.
@@ -862,7 +846,74 @@ void noktalarArasiOrtalama() {
 
     }
 
-    double ortalama = toplam/toplam_nokta; // This variable holds the avarage of all lengths between the dots.
-
-    printf("Butun ikili noktalar arasi uzakliklar ortalamasi: %lf",ortalama);
+    double ortalama = toplam/toplam_nokta;
+    printf("Butun ikili noktalar arasi uzakliklar ortalamasi %lf",ortalama);
+    fprintf(output,"%lf\n",ortalama);
 }
+
+void kupBul() {
+    double enbx = globalNoktalar[0].i;
+    double enby = globalNoktalar[0].j;
+    double enbz = globalNoktalar[0].k;
+    double enkx = globalNoktalar[0].i;
+    double enky = globalNoktalar[0].j;
+    double enkz = globalNoktalar[0].k;
+
+    for(int i=1; i<noktaSayisiInt; i++) {
+        if(enbx<globalNoktalar[i].i) {
+            enbx = globalNoktalar[i].i;
+        }
+        if(enby<globalNoktalar[i].j) {
+            enby = globalNoktalar[i].j;
+        }
+        if(enbz<globalNoktalar[i].k) {
+            enbz = globalNoktalar[i].k;
+        }
+        if(enkx>globalNoktalar[i].i) {
+            enkx = globalNoktalar[i].i;
+        }
+        if(enky>globalNoktalar[i].j) {
+            enky = globalNoktalar[i].j;
+        }
+        if(enkz>globalNoktalar[i].k) {
+            enkz = globalNoktalar[i].k;
+        }
+
+    }
+
+    double farkx;
+    double farky;
+    double farkz;
+    double enbuyukFark;
+
+    farkx = fabs(enbx - enkx);
+    farky = fabs(enby - enky);
+    farkz = fabs(enbz - enkz);
+
+    if(farkx > farky && farkx > farkz) {
+        enbuyukFark = farkx;
+    } else if(farky > farkx && farky > farkz) {
+        enbuyukFark = farky;
+    } else if(farkz > farkx && farkz > farky) {
+        enbuyukFark = farkz;
+    }
+
+    printf("%lf %lf %lf\n",enkx,enky,enkz);
+    printf("%lf %lf %lf\n",enkx+enbuyukFark,enky,enkz);
+    printf("%lf %lf %lf\n",enkx,enky+enbuyukFark,enkz);
+    printf("%lf %lf %lf\n",enkx,enky,enkz+enbuyukFark);
+    printf("%lf %lf %lf\n",enbx,enby,enbz);
+    printf("%lf %lf %lf\n",enbx-enbuyukFark,enby,enbz);
+    printf("%lf %lf %lf\n",enbx,enby-enbuyukFark,enbz);
+    printf("%lf %lf %lf\n",enbx,enby,enbz-enbuyukFark);
+
+    fprintf(output,"%lf %lf %lf\n",enkx,enky,enkz);
+    fprintf(output,"%lf %lf %lf\n",enkx+enbuyukFark,enky,enkz);
+    fprintf(output,"%lf %lf %lf\n",enkx,enky+enbuyukFark,enkz);
+    fprintf(output,"%lf %lf %lf\n",enkx,enky,enkz+enbuyukFark);
+    fprintf(output,"%lf %lf %lf\n",enbx,enby,enbz);
+    fprintf(output,"%lf %lf %lf\n",enbx-enbuyukFark,enby,enbz);
+    fprintf(output,"%lf %lf %lf\n",enbx,enby-enbuyukFark,enbz);
+    fprintf(output,"%lf %lf %lf\n",enbx,enby,enbz-enbuyukFark);
+}
+
