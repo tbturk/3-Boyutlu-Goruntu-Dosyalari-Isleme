@@ -26,7 +26,15 @@
 	<math.h>
 	<conio.h>
 
-1571944045 source:c:\users\bthn0\desktop\github\pro-lab-1-batuhan\main.c
+1571944677 source:c:\users\bthn0\desktop\github\pro-lab-1-batuhan\main.c
+	<stdio.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571953888 source:c:\users\bthn0\desktop\github\pro-lab-1-batuhan - kopya\main.c
 	<stdio.h>
 	<stdlib.h>
 	<dirent.h>

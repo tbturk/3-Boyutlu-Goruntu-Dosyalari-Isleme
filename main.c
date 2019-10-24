@@ -5,7 +5,7 @@
 #include <math.h>
 #include <conio.h>
 
-struct noktaBilgisiRGB {
+struct noktaBilgisiRGB {    //tum datalar icin ortak nokta bilgisi structı
     double i;
     double j;
     double k;
@@ -14,90 +14,89 @@ struct noktaBilgisiRGB {
     int b;
 
 };
-struct noktaBilgisiBinaryRGB {
+struct noktaBilgisiBinaryRGB {  //binary nokta r g b si cekebilmek icin kullanilan fonksiyon.
     int r;
     int g;
     int b;
 };
 
-struct kureYarat {
+struct kureYarat {  //kullanıcidan alinan kure bilgilerinin tutuldugu kure structinin, struct tanimlamasi
     float x;
     float y;
     float z;
     float r;
 };
 
-struct noktaBilgisiXYZ {
+struct noktaBilgisiXYZ {    //binary nokta xyz si cekebilmek icin kullanilan fonksiyon.
     float x;
     float y;
     float z;
 
 };
 
-void karsilamaEkrani();
-int nktKontrol();
-int islemSecim(char *dosyaAdi);
-int dosyaKontrol(FILE *dosya,char *dosyaAdi);
-void kureTanimla(struct kureYarat *kure);
-void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure, float zKure, float rKure);
-int kureIciNoktalar(struct kureYarat kure, float xNokta, float yNokta, float zNokta);
-void noktalarArasiUzaklik();
-void noktalarArasiOrtalama();
-void dosyaAc(const char *konum);
-int klasoruListele(const char *konum);
-int noktaKontrolAsciiXYZ(FILE *dosya,int noktaSayisi);
-int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi);
-int noktaKontrolBinaryXYZ(FILE *dosya,int rgb);
-void dosyaSecim(char *dosyaAdi);//Dosya sectirir. Secilen dosyanýn ismini dosyaAdina atar.
-FILE *dosya;
-FILE *output;
-int NktDosyaSayisi;
-int dosyaKapa; // islemSecim fonksiyonunda dosyaKontrol yapilmamis ise 2 degerini dondurur.
-struct noktaBilgisiRGB *globalNoktalar;
-int noktaSayisiInt;// dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
-int rgbMi=3; // rgb dosyasi olup olmadigini tutar
-int dataVeri;// 1 ise ascii 0 ise binary
+void karsilamaEkrani();     //islemlerin listelenip ekrana basildigi fonksiyon.
+int nktKontrol(const char *konum);  //kendine gonderilen dosya isminin .nkt uzantili olup olmadigini kontrol eder.
+int islemSecim(char *dosyaAdi);     // 1-5 arasi islemleri secme fonksiyonu.
+int dosyaKontrol(FILE *dosya,char *dosyaAdi);   //1.isterin fonksiyonu.
+void kureTanimla();//--------------------------------------------------------------------------------------------------
+void icindeMi(float xNokta, float yNokta, float zNokta, float xKure, float yKure, float zKure, float rKure);//3. isterin fonksiyonlari.
+int kureIciNoktalar(struct kureYarat kure, float xNokta, float yNokta, float zNokta);//---------------------------------------------------------
+void noktalarArasiUzaklik(); //2. isterin fonksiyonu.
+void noktalarArasiOrtalama();//5.isterin fonksiyonu.
+void dosyaAc(const char *konum);    //parametre olarak aldigi dosya adini read modda acar.
+void kupBul(); // 3.isterin fonksiyonu.
+int klasoruListele(const char *konum);      // projenin bulundugu klasordeki nkt dosyalarini listeler.
+int noktaKontrolAsciiXYZ(FILE *dosya);      // ascii xyz dosyasindeki noktalari globalNoktalar struct'ına atar.
+int noktaKontrolAsciiRGB(FILE *dosya);      // ascii xyz dosyasindeki noktalari globalNoktalar struct'ına atar.
+int noktaKontrolBinaryXYZ(FILE *dosya,int rgb);// binary dosyalardaki noktalari globalNoktalar struct'ına atar.
+int dosyaSecim(char *dosyaAdi);    //Dosya sectirir. Secilen dosyanin ismini dosyaAdina atar.
+FILE *dosya;    //anlik acilan dosyasinin file pointeri.
+FILE *output;   // cikti dosyasinin file pointeri.
+struct noktaBilgisiRGB *globalNoktalar;     // anlik okunan nkt dosyasinin nokta bilgilerini icerir.
+struct kureYarat kure;      //kure verilerini tutar.
+int NktDosyaSayisi;     // .nkt uzantili dosyalarin sayisi.
+int dosyaKapa;      // islemSecim fonksiyonunda dosyaKontrol yapilmamis ise 2 degerini dondurur.
+int noktaSayisiInt;     // dosyadan okuma islemi bittikten sonra nokta veri sayisi ile compare edilecek, eger ki farkliysa hata mesaji donecek.
+int rgbMi=3;    // rgb dosyasi olup olmadigini tutar  1:ise xyzrgb 0:ise xyz.
+int dataVeri;   // 1 ise ascii 0 ise binary.
+int kureSecim=0;    //islemSecim() de kullanicidan küre verisinin bir kere alinmasi icin.(eger deger 1 se kure tekrar alinmaz);
+
 
 
 int main(int argc, char **argv) {
     int devam;
-    int yeniNkt=1;
 
     output = fopen("output.nkt","a");
-
+    int karsilama=0;
     int dosyaUzunlugu;
-    while(yeniNkt==1) {
-        system("CLS");
+    while(1) {
         dosyaUzunlugu=klasoruListele(".");
         if(NktDosyaSayisi==0) {
             printf("Klasorde NKT Dosyasi Bulunamadi\n");
             break;
         }
         char dosyaAdi[dosyaUzunlugu];
-        dosyaSecim(dosyaAdi);
+        if(dosyaSecim(dosyaAdi)==0){
+            break;
+        }
         fprintf(output,"\t\t%s dosyasi uzerinde calisiliyor...\n",dosyaAdi);
         dosyaAc(dosyaAdi);
         karsilamaEkrani();
         devam=1;
         dosyaKapa=2;//her nkt'de dosyaKontrol'u sorgulamasi icin
-
-        char outputAdi[dosyaUzunlugu+6];
-        strcpy(outputAdi,"output");
-        strcat(outputAdi,dosyaAdi);
         while(devam==1) {
             devam=islemSecim(dosyaAdi);
-            if(devam==1) {
-                system("CLS");
-                karsilamaEkrani();
+            if(devam==1&&karsilama==0) {
+                    karsilamaEkrani();
+                    karsilama++;
             }
         }
         if(devam==0) {
             fclose(dosya);
             free(globalNoktalar);
+            system("CLS");
             printf("\n\n\t\t\t\t%s kapandi\n\n",dosyaAdi);//dosyanin kapandigina dair bilgi dondurur
         }
-        printf("Baska Bir nkt Dosyasi Uzerinde Islem Yapmak Icin 1'e basin.");
-        scanf("%d",&yeniNkt);
 
     }
     fclose(output);
@@ -105,135 +104,7 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-int noktaKontrolAsciiXYZ(FILE *dosya,int noktaSayisi) {
 
-    fseek(dosya,0,SEEK_SET);
-    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisi * sizeof(struct noktaBilgisiRGB));
-    char temp[50];
-
-    int boyut=0;
-    for(int i=0; i<5; i++) {
-        fgets(temp,50,dosya);
-        boyut += strlen(temp);
-    }
-    boyut--;
-    char cumle2[100];
-    fseek(dosya,boyut+5,SEEK_SET);
-    int boslukCount;
-    int satir2=6;
-    for(int i=0; i<noktaSayisi; i++) {
-        fgets(cumle2,100,dosya);
-        strtok(cumle2,"\n");
-        int cumle_boyut = strlen(cumle2);
-        boslukCount=0;
-        for(int j=0; j<cumle_boyut; j++) {
-            if(cumle2[j] == ' ') {
-                boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
-            }
-        }
-
-        if(boslukCount<2) {
-            printf("\n%d. satirda Nokta verisi eksiktir",satir2);
-            fprintf(output,"%d. satirda Nokta verisi eksiktir.\n",satir2);
-            return 0;
-        }
-
-        else if(boslukCount>2) {
-            printf("\n%d. satirda Nokta verilerinde fazlalik vardir.",satir2);
-            fprintf(output,"%d. satirda Nokta verilerinde fazlalik vardir.\n",satir2);
-            return 0;
-        }
-
-        satir2++;
-    }
-
-    fseek(dosya,boyut,SEEK_SET);
-
-    while(getc(dosya)!=EOF) {
-        for(int i=0; i<noktaSayisi; i++) {
-            fscanf(dosya,"%lf %lf %lf\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k));
-        }
-    }
-    return 1;
-
-}
-int noktaKontrolAsciiRGB(FILE *dosya,int noktaSayisi) {
-    // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
-    fseek(dosya,0,SEEK_SET);
-    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisi * sizeof(struct noktaBilgisiRGB));
-    char temp[50];
-    int boyut=0;
-    for(int i=0; i<5; i++) {
-        fgets(temp,50,dosya);
-        boyut += strlen(temp);
-    }
-    char cumle2[100];
-    fseek(dosya,boyut+5,SEEK_SET);
-    int boslukCount;
-    int satir2=6;
-    for(int i=0; i<noktaSayisi; i++) {
-        fgets(cumle2,100,dosya);
-        strtok(cumle2,"\n");
-        int cumle_boyut = strlen(cumle2);
-        boslukCount=0;
-        for(int j=0; j<cumle_boyut; j++) {
-            if(cumle2[j] == ' ') {
-                boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
-            }
-        }
-
-        if(boslukCount<5) {
-            printf("\n%d. satirda Nokta verisi r g b bilgileri olmadan verilmistir.",satir2);
-            fprintf(output,"%d. satirda Nokta verisi r g b bilgileri olmadan verilmistir.\n",satir2);
-            return 0;
-        }
-
-        else if(boslukCount>5) {
-            printf("\n%d. satirda Nokta verilerinde fazlalik vardir.",satir2);
-            fprintf(output,"%d. satirda Nokta verilerinde fazlalik vardir.\n",satir2);
-            return 0;
-        }
-
-        satir2++;
-    }
-
-
-    fseek(dosya,boyut,SEEK_SET);
-
-    while(getc(dosya)!=EOF) {
-        // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
-        for(int i=0; i<noktaSayisi; i++) {
-            fscanf(dosya,"%lf %lf %lf %d %d %d\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k),&(globalNoktalar[i].r),&(globalNoktalar[i].g),&(globalNoktalar[i].b));
-        }
-    }
-
-
-    int satir=6;
-
-    for(int i=0; i<noktaSayisi; i++) {
-        if((globalNoktalar[i].r)<0 || (globalNoktalar[i].r)>255) {
-            printf("\n%d. satirda rgb bilgisi hatali",satir);
-            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
-            return 0;
-        }
-
-        else if((globalNoktalar[i].g)<0 || (globalNoktalar[i].g)>255) {
-            printf("\n%d. satirda rgb bilgisi hatali",satir);
-            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
-            return 0;
-        }
-
-        else if((globalNoktalar[i].b)<0 || (globalNoktalar[i].b)>255) {
-            printf("\n%d. satirda rgb bilgisi hatali",satir);
-            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
-            return 0;
-        }
-
-        satir++;
-    }
-
-    return 1;
-}
 
 int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
     int hataSayisi=0;
@@ -377,7 +248,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
             if(hataSayisi==0) {
                 printf("\nDosyanin Baslik Bilgilerinde Herhangi Bir Hata Yoktur");
                 if(rgbMi==1) {
-                    if(noktaKontrolAsciiRGB(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                    if(noktaKontrolAsciiRGB(dosya)==1) { //eger nokta kontrol hataliysa dosya kapanir.
                         fputs("Tum dosyalar uyumludur\n",output);
                         return 1;
                     } else {
@@ -385,7 +256,7 @@ int dosyaKontrol(FILE *dosya,char *dosyaAdi) {
                         fputs("Dosyalar uyumlu degildir.\n\n",output);
                     }
                 } else if(rgbMi==0) {
-                    if(noktaKontrolAsciiXYZ(dosya,noktaSayisiInt)==1) { //eger nokta kontrol hataliysa dosya kapanir.
+                    if(noktaKontrolAsciiXYZ(dosya)==1) { //eger nokta kontrol hataliysa dosya kapanir.
                         fputs("Tum dosyalar uyumludur\n",output);
                         return 1;
                     } else {
@@ -532,8 +403,139 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
         printf("%d",noktaSayisiInt);
         return 1;
     }
+    return 1;
 }
 
+int noktaKontrolAsciiXYZ(FILE *dosya) {
+
+
+    fseek(dosya,0,SEEK_SET);
+    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisiInt * sizeof(struct noktaBilgisiRGB));
+    char temp[50];
+
+    int boyut=0;
+    for(int i=0; i<5; i++) {
+        fgets(temp,50,dosya);
+        boyut += strlen(temp);
+    }
+    boyut--;
+    char cumle2[100];
+    fseek(dosya,boyut+5,SEEK_SET);
+    int boslukCount;
+    int satir2=6;
+    for(int i=0; i<noktaSayisiInt; i++) {
+        fgets(cumle2,100,dosya);
+        strtok(cumle2,"\n");
+        int cumle_boyut = strlen(cumle2);
+        boslukCount=0;
+        for(int j=0; j<cumle_boyut; j++) {
+            if(cumle2[j] == ' ') {
+                boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
+            }
+        }
+
+        if(boslukCount<2) {
+            printf("\n%d. satirda Nokta verisi eksiktir",satir2);
+            fprintf(output,"%d. satirda Nokta verisi eksiktir.\n",satir2);
+            return 0;
+        }
+
+        else if(boslukCount>2) {
+            printf("\n%d. satirda Nokta verilerinde fazlalik vardir.",satir2);
+            fprintf(output,"%d. satirda Nokta verilerinde fazlalik vardir.\n",satir2);
+            return 0;
+        }
+
+        satir2++;
+    }
+
+    fseek(dosya,boyut,SEEK_SET);
+
+    while(getc(dosya)!=EOF) {
+        for(int i=0; i<noktaSayisiInt; i++) {
+            fscanf(dosya,"%lf %lf %lf\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k));
+        }
+    }
+    return 1;
+
+}
+int noktaKontrolAsciiRGB(FILE *dosya) {
+    // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
+    fseek(dosya,0,SEEK_SET);
+    globalNoktalar = (struct noktaBilgisiRGB*)malloc(noktaSayisiInt * sizeof(struct noktaBilgisiRGB));
+    char temp[50];
+    int boyut=0;
+    for(int i=0; i<5; i++) {
+        fgets(temp,50,dosya);
+        boyut += strlen(temp);
+    }
+    char cumle2[100];
+    fseek(dosya,boyut+5,SEEK_SET);
+    int boslukCount;
+    int satir2=6;
+    for(int i=0; i<noktaSayisiInt; i++) {
+        fgets(cumle2,100,dosya);
+        strtok(cumle2,"\n");
+        int cumle_boyut = strlen(cumle2);
+        boslukCount=0;
+        for(int j=0; j<cumle_boyut; j++) {
+            if(cumle2[j] == ' ') {
+                boslukCount++; // if(boslukCount != 5) --> hata mesaji dondurecek
+            }
+        }
+
+        if(boslukCount<5) {
+            printf("\n%d. satirda Nokta verisi r g b bilgileri olmadan verilmistir.",satir2);
+            fprintf(output,"%d. satirda Nokta verisi r g b bilgileri olmadan verilmistir.\n",satir2);
+            return 0;
+        }
+
+        else if(boslukCount>5) {
+            printf("\n%d. satirda Nokta verilerinde fazlalik vardir.",satir2);
+            fprintf(output,"%d. satirda Nokta verilerinde fazlalik vardir.\n",satir2);
+            return 0;
+        }
+
+        satir2++;
+    }
+
+
+    fseek(dosya,boyut,SEEK_SET);
+
+    while(getc(dosya)!=EOF) {
+        // The size of globalNoktalar[] will be change when we found the number of globalNoktalar lines.
+        for(int i=0; i<noktaSayisiInt; i++) {
+            fscanf(dosya,"%lf %lf %lf %d %d %d\n",&(globalNoktalar[i].i),&(globalNoktalar[i].j),&(globalNoktalar[i].k),&(globalNoktalar[i].r),&(globalNoktalar[i].g),&(globalNoktalar[i].b));
+        }
+    }
+
+
+    int satir=6;
+
+    for(int i=0; i<noktaSayisiInt; i++) {
+        if((globalNoktalar[i].r)<0 || (globalNoktalar[i].r)>255) {
+            printf("\n%d. satirda rgb bilgisi hatali",satir);
+            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
+            return 0;
+        }
+
+        else if((globalNoktalar[i].g)<0 || (globalNoktalar[i].g)>255) {
+            printf("\n%d. satirda rgb bilgisi hatali",satir);
+            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
+            return 0;
+        }
+
+        else if((globalNoktalar[i].b)<0 || (globalNoktalar[i].b)>255) {
+            printf("\n%d. satirda rgb bilgisi hatali",satir);
+            fprintf(output,"%d. satirda rgb bilgisi hatali.\n",satir);
+            return 0;
+        }
+
+        satir++;
+    }
+
+    return 1;
+}
 
 int klasoruListele(const char *konum) {
     struct dirent *entry;  // Klasor(dizin) girisinin pointeri
@@ -546,13 +548,13 @@ int klasoruListele(const char *konum) {
         printf("Klasor Acilamadi" );
         return 1;
     }
-
+    printf("\t0-Programi Sonlandir\n");
     while ((entry = readdir(dir)) != NULL) {
         if(nktKontrol(entry->d_name)==1) {
             NktDosyaSayisi++;
             if(enUzunBoyut<strlen(entry->d_name))//en uzun dosya isminin boyutunu tutar;
                 enUzunBoyut = strlen(entry->d_name);
-            printf("\t%d)%s\n",NktDosyaSayisi,entry->d_name);
+            printf("\t%d-%s\n",NktDosyaSayisi,entry->d_name);
 
         }
     }
@@ -560,14 +562,17 @@ int klasoruListele(const char *konum) {
     return enUzunBoyut;
 }
 
-void dosyaSecim(char *dosyaAdi) {
+int dosyaSecim(char *dosyaAdi) {
     strcpy(dosyaAdi,"default");
     int satirNo;
     printf("Islem yapmak istediginiz NKT dosyasinin satir numarasini giriniz:");
     scanf("%d",&satirNo);
-    while(satirNo>NktDosyaSayisi||satirNo<=0) {
+    while(satirNo>NktDosyaSayisi||satirNo<0) {
         printf("Yanlis bir deger girdiniz. [1-%d] arasi bir deger giriniz:",NktDosyaSayisi);
         scanf("%d",&satirNo);
+    }
+    if(satirNo==0){
+        return 0;
     }
     struct dirent *entry;
     int i=0;
@@ -575,7 +580,7 @@ void dosyaSecim(char *dosyaAdi) {
 
     if (dir == NULL) {
         printf("Klasor Acilamadi" );
-        return;
+        return 0;
     }
     while ((entry = readdir(dir)) != NULL) {
 
@@ -587,6 +592,7 @@ void dosyaSecim(char *dosyaAdi) {
         }
     }
     closedir(dir);
+    return 1;
 }
 
 void dosyaAc(const char *konum) { //iki okuma modunda da acmayi deneyecek, null deger donderirse diger modda okuyacak.
@@ -602,12 +608,13 @@ void dosyaAc(const char *konum) { //iki okuma modunda da acmayi deneyecek, null 
 
 void karsilamaEkrani() {
 
-    printf("ISLEMLER \n----------------------------------------- \n"
+    printf("\nISLEMLER \n----------------------------------------- \n"
            "	1.) Dosya Kontrolu \n"
            "	2.) En Yakin/Uzak Noktalar \n"
            "	3.) Tum Noktalari Icine Alan Kup \n"
            "	4.) Kurenin Icindeki Noktalar \n"
            "	5.) Nokta Uzakliklari Ortalamasi \n"
+           "	6.) Yeni Nkt Dosyasina Gec \n"
            "-----------------------------------------\n"
            "(Secim yapmak istediginiz islemin numarisini girin Or:4):  ");
 }
@@ -622,7 +629,6 @@ int nktKontrol(const char *konum) {
 int islemSecim(char *dosyaAdi) {
 
     int secim;//secim sifir oldugu surece while dongusu calismaya devam eder
-    int devam;
     while(1) {
         scanf("%d", &secim);
         switch(secim) {
@@ -662,8 +668,10 @@ int islemSecim(char *dosyaAdi) {
             } else {
                 fputs("SECIM 4\n",output);
                 system("CLS");
-                struct kureYarat kure;
-                kureTanimla(&kure);
+                if(kureSecim==0){//kureyi kullanicidan sadece bir kere almak icin.
+                    kureTanimla(kure);
+                    kureSecim=1;
+                }
                 system("CLS");
                 printf( "cx=%f\n"
                         "cy=%f\n"
@@ -713,6 +721,7 @@ int islemSecim(char *dosyaAdi) {
                 noktalarArasiOrtalama();
                 break;
             }
+        case 6: return 0;
         default:
             printf("yanlis bir deger girdiniz (lutfen [1,5] arasi deger giriniz) \n");
             secim=0;
@@ -723,26 +732,21 @@ int islemSecim(char *dosyaAdi) {
             break;
     }
     if(dosyaKapa==1) {
-        printf("\nYeni Islem Yapmak Icin 1 e basiniz");
-        scanf("%d",&devam);
-        if(devam!=1) {
-            return 0;
-        } else
-            return 1;
+        return 1;
     } else
         return 0;
 }
 
-void kureTanimla(struct kureYarat *kure) {
+void kureTanimla() {
 
     printf("Kurenin merkezinin x koordinatini girin:");
-    scanf("%f",&kure->x);
+    scanf("%f",&kure.x);
     printf("Kurenin merkezinin y koordinatini girin:");
-    scanf("%f",&kure->y);
+    scanf("%f",&kure.y);
     printf("Kurenin merkezinin z koordinatini girin:");
-    scanf("%f",&kure->z);
+    scanf("%f",&kure.z);
     printf("Kurenin yaricapini girin               :");
-    scanf("%f",&kure->r);
+    scanf("%f",&kure.r);
 }
 
 int kureIciNoktalar(struct kureYarat kure, float xNokta, float yNokta, float zNokta) {
@@ -814,7 +818,7 @@ void noktalarArasiUzaklik() {
     } else if(rgbMi==1) {
         printf("Iki nokta arasi en buyuk uzaklik %lf\n",enb);
         printf("Bu iki noktanin bilgileri;\nIlk nokta bilgileri: x: %lf y: %lf z: %lf r: %d g: %d b: %d\n",globalNoktalar[yer3].i,globalNoktalar[yer3].j,globalNoktalar[yer3].k,globalNoktalar[yer3].r,globalNoktalar[yer3].g,globalNoktalar[yer3].b);
-        printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf\n\n",globalNoktalar[yer4].i,globalNoktalar[yer4].j,globalNoktalar[yer4].k,globalNoktalar[yer4].r,globalNoktalar[yer4].g,globalNoktalar[yer4].b);
+        printf("Ikinci nokta bilgileri: x: %lf y: %lf z: %lf r: %d g: %d b: %d\n\n",globalNoktalar[yer4].i,globalNoktalar[yer4].j,globalNoktalar[yer4].k,globalNoktalar[yer4].r,globalNoktalar[yer4].g,globalNoktalar[yer4].b);
 
 
         printf("Iki nokta arasi en kucuk uzaklik %lf\n",enk);
