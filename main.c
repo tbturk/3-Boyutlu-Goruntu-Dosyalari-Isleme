@@ -345,7 +345,6 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
         sayac/=2;
     }
 
-    printf("\n%d\n",sayac);
     noktaSayisiInt=sayac;
 
     fseek(dosya,boyut,SEEK_SET);
@@ -372,12 +371,10 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
             globalNoktalar[sayac1].i=(double)noktalar.x;
             globalNoktalar[sayac1].j=(double)noktalar.y;
             globalNoktalar[sayac1].k=(double)noktalar.z;
-            printf("\n%lf %lf %lf\n",globalNoktalar[sayac1].i,globalNoktalar[sayac1].j,globalNoktalar[sayac1].k);
             sayac1++;
         }
         return 1;
     } else if(rgb==1) {
-        printf("%d",dosyaBoyut);
         if(dosyaBoyut%24!=0) {
             printf("\nBaslik Bilgisi Ile Nokta Sayisi Uyusmuyor\n");
             return 0;
@@ -390,8 +387,6 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
             struct noktaBilgisiBinaryRGB noktalar1;
             fread(&noktalar,sizeof(struct noktaBilgisiXYZ),1,dosya);
             fread(&noktalar1,sizeof(struct noktaBilgisiBinaryRGB),1,dosya);
-
-            printf("\n%f %f %f %d %d %d",noktalar.x,noktalar.y,noktalar.z,noktalar1.r,noktalar1.g,noktalar1.b);
             globalNoktalar[sayac1].i=noktalar.x;
             globalNoktalar[sayac1].j=noktalar.y;
             globalNoktalar[sayac1].k=noktalar.z;
@@ -400,7 +395,6 @@ int noktaKontrolBinaryXYZ(FILE *dosya,int rgb) {
             globalNoktalar[sayac1].b=(noktalar1.b%256);
             sayac1++;
         }
-        printf("%d",noktaSayisiInt);
         return 1;
     }
     return 1;
@@ -931,4 +925,3 @@ void kupBul() {
     fprintf(output,"%lf %lf %lf\n",enbx,enby-enbuyukFark,enbz);
     fprintf(output,"%lf %lf %lf\n",enbx,enby,enbz-enbuyukFark);
 }
-
