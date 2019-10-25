@@ -1,0 +1,52 @@
+# depslib dependency file v1.0
+1571848914 source:c:\users\bthn0\desktop\pro-lab-1-batuhan\main.c
+	<stdio.h>
+	<unistd.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571770378 source:c:\users\Ýbrahim\desktop\pro-lab-1-batuhan\main.c
+	<stdio.h>
+	<unistd.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571910311 source:d:\pro-lab-1-batuhan\main.c
+	<stdio.h>
+	<unistd.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571944677 source:c:\users\bthn0\desktop\github\pro-lab-1-batuhan\main.c
+	<stdio.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571953888 source:c:\users\bthn0\desktop\github\pro-lab-1-batuhan - kopya\main.c
+	<stdio.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+
+1571986400 source:d:\github\pro-lab-1-batuhan - final\main.c
+	<stdio.h>
+	<stdlib.h>
+	<dirent.h>
+	<string.h>
+	<math.h>
+	<conio.h>
+

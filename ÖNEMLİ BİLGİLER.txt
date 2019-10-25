@@ -1,3 +1,0 @@
-Satır satır okuma yaparken formatlı bir şekilde okumak için "fscanf" komutu kullanılır.
-
-fscanf("%f %f &f",veri.x,veri.y,veri.z);
